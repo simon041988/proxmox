@@ -18,7 +18,8 @@ pct create $VMID $OSTEMPLATE -rootfs $DISKSIZE -swap $SWAPSIZE -cpus $CPUS -memo
 pct set $VMID -hostname ansible
 
 # Set root password interactively
-pct set $VMID -rootfs password
+read -sp 'Enter root password: ' ROOT_PASSWORD
+pct set $VMID -rootfs password=$ROOT_PASSWORD
 
 # Set SSH port
 pct set $VMID -ssh-port 2222
@@ -33,12 +34,11 @@ sleep 10
 pct exec $VMID -- apt update
 pct exec $VMID -- apt install -y sshpass
 
-
 # Install Ansible Core and AWX
-pct exec $vmid -- sh -c 'echo "deb http://deb.debian.org/debian buster-backports main" >> /etc/apt/sources.list && apt-get update && apt-get -y install ansible'
-pct exec $vmid -- sh -c 'apt-get -y install curl gnupg2 software-properties-common && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" && apt-get update && apt-get -y install docker-ce docker-ce-cli containerd.io'
-pct exec $vmid -- sh -c 'curl -s https://api.github.com/repos/ansible/awx/archive/refs/tags/17.0.0.tar.gz | tar -xvz && cd awx-17.0.0/installer/ && ansible-playbook -i inventory install.yml'
+pct exec $VMID -- sh -c 'echo "deb http://deb.debian.org/debian buster-backports main" >> /etc/apt/sources.list && apt-get update && apt-get -y install ansible'
+pct exec $VMID -- sh -c 'apt-get -y install curl gnupg2 software-properties-common && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" && apt-get update && apt-get -y install docker-ce docker-ce-cli containerd.io'
+pct exec $VMID -- sh -c 'curl -s https://api.github.com/repos/ansible/awx/archive/refs/tags/17.0.0.tar.gz | tar -xvz && cd awx-17.0.0/installer/ && ansible-playbook -i inventory install.yml'
 
 # Print login information
-echo "AWX should now be installed and accessible at https://192.168.2.100 with your root password."
-echo "SSH access is available on port $sshport with username 'root' and your root password." 
+echo "AWX should now be installed and accessible at https://192.168.2.27 with your root password."
+echo "SSH access is available on port 2222 with username 'root' and your root password."
