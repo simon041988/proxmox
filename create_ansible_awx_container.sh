@@ -16,10 +16,14 @@ GATEWAY="192.168.2.1"
 DNS_SERVER="192.168.2.11"
 
 # Create the Proxmox LXC container
-qm create $VM_ID --name $CONTAINER_NAME --net0 "name=eth0,bridge=vmbr0,ip=$IP_ADDRESS/24,gw=$GATEWAY" --ostype $OS_TEMPLATE --rootfs $ROOTFS_SIZE --memory $MEMORY --swap $SWAP --cores $CPU_CORES --sshkey $SSH_PUBLIC_KEY --ssh-port $SSH_PORT --onboot 1 --startup 1 --searchdomain $DNS_SERVER --agent 1 --hookscript /usr/share/doc/vzdump/examples/hookscript.pl --lock backup
+pct create $VM_ID $OS_TEMPLATE --hostname $CONTAINER_NAME --memory $MEMORY --swap $SWAP --cpu $CPU_CORES --net0 name=eth0,bridge=vmbr0,ip=$IP_ADDRESS/24,gw=$GATEWAY --ssh-public-keys $SSH_PUBLIC_KEY --onboot 1 --ostype Debian --searchdomain $DNS_SERVER
+
+# Set root password for container
+echo "password123" | pct set $VM_ID --root-password
 
 # Start the container
-qm start $VM_ID
+pct start $VM_ID
+
 
 
 # Warten, bis der Container gestartet ist
